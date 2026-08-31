@@ -27,9 +27,6 @@ const initialForm: FormState = {
   mensaje: "",
 }
 
-const WEB3FORMS_ACCESS_KEY = String(
-  import.meta.env.VITE_WEB3FORMS_ACCESS_KEY ?? "",
-)
 const TURNSTILE_SITE_KEY = String(import.meta.env.VITE_TURNSTILE_SITE_KEY ?? "")
 
 const contactStrip = "info@qbitsglobal.com · Respuesta en 48 h hábiles"
@@ -89,13 +86,10 @@ export default function Contacto() {
 
     setEnviando(true)
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `Diagnóstico Qbits Global — ${form.empresa.trim()}`,
-          from_name: form.nombre.trim(),
           nombre: form.nombre.trim(),
           email: form.email.trim(),
           empresa: form.empresa.trim(),

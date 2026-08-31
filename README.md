@@ -55,21 +55,13 @@ npm run dev
 El formulario de contacto usa [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile)
 y [Web3Forms](https://web3forms.com).
 
-### Variables públicas (cliente)
+### Claves públicas (código)
 
-Crea un archivo `.env` en la raíz (no se versiona) con la access key de Web3Forms. Es
-**pública por diseño** y se usa para el envío client-side:
+La site key de Turnstile y la access key de Web3Forms son **públicas por diseño** y viven
+en `src/config.ts` (no son secretos; el navegador las necesita).
 
-```
-VITE_WEB3FORMS_ACCESS_KEY=tu_access_key_de_web3forms
-```
-
-El script `verify-env` integrado en `npm run build` aborta si esta variable falta
-(necesaria para el envío) y también si detecta una secret key de Turnstile en el entorno.
-
-> El build de **Cloudflare Pages clona el repo, así que `.env` no viaja a CI**. Declara la
-> variable en el dashboard: **Settings → Environment variables (Production)** →
-> `VITE_WEB3FORMS_ACCESS_KEY`.
+El script `verify-env` integrado en `npm run build` solo aborta si detecta una secret key
+de Turnstile en el entorno (`.env` o variables), que nunca debe ir al bundle.
 
 ### Secreto del Worker de Cloudflare
 
@@ -109,7 +101,7 @@ Antes del primer despliegue, autentícate con `npx wrangler login`.
 
 - **Cloudflare Turnstile**: la site key (en `src/config.ts`) debe tener permitido el dominio
   `qbitsglobal.com`. La secret key se configura como secreto del Worker.
-- **Web3Forms**: la access key se configura en `.env` / Environment variables del proyecto.
+- **Web3Forms**: la access key pública vive en `src/config.ts`.
 
 Referencias: [Web3Forms](https://web3forms.com) · [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile)
 

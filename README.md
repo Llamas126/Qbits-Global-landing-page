@@ -21,6 +21,7 @@ src/                    Código fuente
     ui/                 Primitivas de UI (shadcn)
   lib/                  Utilidades
   config.ts             Constantes públicas (site key de Turnstile)
+  worker.ts             Cloudflare Worker (endpoint /api/contact)
   App.tsx               Composición de las secciones
   main.tsx              Punto de entrada
   index.css             Tokens de diseño y estilos globales
@@ -43,11 +44,11 @@ npm run dev
 | Comando            | Descripción                                    |
 | ------------------ | ---------------------------------------------- |
 | `npm run dev`      | Inicia el servidor de desarrollo con HMR       |
-| `npm run dev:worker`| Levanta las Functions de Pages localmente      |
-| `npm run build`    | Verifica que no haya claves sensibles, compila y genera dist
+| `npm run dev:worker`| Levanta el Worker + assets localmente          |
+| `npm run build`    | Verifica que no haya claves sensibles, compila y genera dist |
 | `npm run preview`  | Previsualiza la build de producción            |
 | `npm run lint`     | Ejecuta el linter de Oxlint                    |
-| `npm run deploy`   | Compila y publica en Cloudflare Pages          |
+| `npm run deploy`   | Compila y publica en Cloudflare Workers        |
 
 ## Configuración
 
@@ -62,20 +63,21 @@ nunca debe ir en el bundle del cliente).
 ### Secretos (Worker de Cloudflare)
 
 La Web3Forms access key y la Turnstile secret key **nunca** viajan en el bundle del
-cliente. Se guardan como secretos del Worker de Cloudflare Pages
-(proyecto `qbits-global-landing-page`):
+cliente. Se guardan como secretos del Worker de Cloudflare (proyecto `qbits-global`):
 
 ```bash
-npx wrangler pages secret put WEB3FORMS_ACCESS_KEY
-npx wrangler pages secret put TURNSTILE_SECRET_KEY
+npx wrangler secret put WEB3FORMS_ACCESS_KEY --name qbits-global
+npx wrangler secret put TURNSTILE_SECRET_KEY --name qbits-global
 ```
 
-### Funciones de Cloudflare Pages
+### Worker + Workers Assets
 
-La ruta `functions/api/contact.js` implementa una [Pages Function](https://developers.cloudflare.com/pages/functions/)
-que valida el token de Turnstile con la *secret key* en el servidor y reenvía el envío a
-Web3Forms. En desarrollo, `npm run dev:worker` expone las funciones en `http://localhost:8788`
-y Vite redirige `/api` a esa dirección (ver `vite.config.ts`).
+`src/worker.ts` implementa el [Cloudflare Worker](https://developers.cloudflare.com/workers/)
+que maneja `POST /api/contact` (verificación server-side de Turnstile con la *secret key* y
+reenvío a Web3Forms). Los archivos estáticos de `dist/` se sirven directamente vía
+[Workers Assets](https://developers.cloudflare.com/workers/static-assets/).
+
+En desarrollo, `npm run dev:worker` levanta el Worker + assets localmente.
 
 ### Despliegue
 
@@ -83,8 +85,8 @@ y Vite redirige `/api` a esa dirección (ver `vite.config.ts`).
 npm run deploy
 ```
 
-Publica `dist/` (con las Functions incluidas) en Cloudflare Pages. Antes del primer
-despliegue, autentícate con `npx wrangler login`.
+Compila el frontend (`dist/`) y publica el Worker + assets estáticos en Cloudflare Workers.
+Antes del primer despliegue, autentícate con `npx wrangler login`.
 
 ### Requisitos en los paneles externos
 

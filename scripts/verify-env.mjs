@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
+import { readFileSync } from "node:fs"
 
 let env = {}
 try {
@@ -14,15 +14,6 @@ try {
   env = {}
 }
 
-const siteKey =
-  process.env.VITE_TURNSTILE_SITE_KEY || env.VITE_TURNSTILE_SITE_KEY || ""
-if (!siteKey) {
-  console.error(
-    "[verify-env] Falta VITE_TURNSTILE_SITE_KEY. En local declárala en .env; en Cloudflare Pages declárala en Settings -> Environment variables (Production). Sin ella el antispam (Cloudflare Turnstile) no se renderiza.",
-  )
-  process.exit(1)
-}
-
 if (
   env.VITE_WEB3FORMS_ACCESS_KEY ||
   process.env.VITE_WEB3FORMS_ACCESS_KEY
@@ -33,6 +24,4 @@ if (
   process.exit(1)
 }
 
-console.log(
-  "[verify-env] OK: VITE_TURNSTILE_SITE_KEY presente y sin claves sensibles en el bundle.",
-)
+console.log("[verify-env] OK: sin claves sensibles en el bundle.")

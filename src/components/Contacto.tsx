@@ -126,9 +126,11 @@ export default function Contacto() {
       turnstileRef.current?.reset()
     } catch (err) {
       console.error(err)
-      toast.error(
-        "No pudimos enviar tu solicitud. Inténtalo de nuevo en un momento.",
-      )
+      const detail =
+        err instanceof Error && err.message
+          ? err.message
+          : "No pudimos enviar tu solicitud. Inténtalo de nuevo en un momento."
+      toast.error(detail)
     } finally {
       setEnviando(false)
     }

@@ -14,11 +14,21 @@ try {
   env = {}
 }
 
-if (env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY) {
+const localSecret = env.TURNSTILE_SECRET_KEY
+const exposeViaVite = Object.keys(process.env).some((key) => {
+  if (!key.startsWith("VITE_")) return false
+  const val = process.env[key]
+  return (
+    /TURNSTILE_SECRET/.test(key) ||
+    (typeof val === "string" && /TURNSTILE_SECRET/.test(val))
+  )
+})
+
+if (localSecret || exposeViaVite) {
   console.error(
-    "[verify-env] TURNSTILE_SECRET_KEY no debe vivir en el bundle del cliente ni en VITE_*. Se configura como secreto del Worker (wrangler secret put TURNSTILE_SECRET_KEY --name qbits-global).",
+    "[verify-env] TURNSTILE_SECRET_KEY no debe ir al bundle del cliente. No la declares en .env ni como variable VITE_*; se configura como secreto del Worker (wrangler secret put TURNSTILE_SECRET_KEY --name qbits-global).",
   )
   process.exit(1)
 }
 
-console.log("[verify-env] OK: sin secretos en el bundle.")
+console.log("[verify-env] OK: sin secretos expuestos al bundle.")

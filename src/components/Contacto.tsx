@@ -4,6 +4,7 @@ import { toast } from "sonner"
 import { Turnstile } from "@marsidev/react-turnstile"
 import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import SectionHeading from "./Section"
+import { TURNSTILE_SITE_KEY } from "@/config"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -26,8 +27,6 @@ const initialForm: FormState = {
   telefono: "",
   mensaje: "",
 }
-
-const TURNSTILE_SITE_KEY = String(import.meta.env.VITE_TURNSTILE_SITE_KEY ?? "")
 
 const contactStrip = "info@qbitsglobal.com · Respuesta en 48 h hábiles"
 

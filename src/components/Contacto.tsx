@@ -5,6 +5,10 @@ import { Turnstile } from "@marsidev/react-turnstile"
 import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import SectionHeading from "./Section"
 import { TURNSTILE_SITE_KEY } from "@/config"
+
+const WEB3FORMS_ACCESS_KEY = String(
+  import.meta.env.VITE_WEB3FORMS_ACCESS_KEY ?? "",
+)
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -85,16 +89,33 @@ export default function Contacto() {
 
     setEnviando(true)
     try {
-      const response = await fetch("/api/contact", {
+      const verification = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ turnstile: captchaToken }),
+      })
+
+      const verificationData = await verification.json()
+      if (!verification.ok || !verificationData.success) {
+        throw new Error(
+          verificationData.message ||
+            "La verificación de seguridad no fue válida.",
+        )
+      }
+
+      const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `Diagnóstico Qbits Global — ${form.empresa.trim()}`,
+          from_name: form.nombre.trim(),
+          botcheck: "",
           nombre: form.nombre.trim(),
           email: form.email.trim(),
           empresa: form.empresa.trim(),
           telefono: form.telefono.trim(),
           mensaje: form.mensaje.trim(),
-          turnstile: captchaToken,
         }),
       })
 

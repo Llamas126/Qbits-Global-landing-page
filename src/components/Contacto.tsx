@@ -85,6 +85,7 @@ export default function Contacto() {
 
     setEnviando(true)
     try {
+      console.log("[contacto] paso 1: validando en worker")
       const verification = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -92,6 +93,12 @@ export default function Contacto() {
       })
 
       const verificationData = await verification.json()
+      console.log(
+        "[contacto] worker respondio: status=",
+        verification.status,
+        "body=",
+        verificationData,
+      )
       if (!verification.ok || !verificationData.success) {
         throw new Error(
           verificationData.message ||
@@ -99,6 +106,7 @@ export default function Contacto() {
         )
       }
 
+      console.log("[contacto] paso 2: enviando a web3forms")
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -116,6 +124,12 @@ export default function Contacto() {
       })
 
       const data = await response.json()
+      console.log(
+        "[contacto] paso 2 Web3Forms: status=",
+        response.status,
+        "body=",
+        data,
+      )
       if (!response.ok || !data.success) {
         throw new Error(data.message || "No se pudo enviar la solicitud.")
       }

@@ -14,14 +14,20 @@ try {
   env = {}
 }
 
-if (
-  env.VITE_WEB3FORMS_ACCESS_KEY ||
-  process.env.VITE_WEB3FORMS_ACCESS_KEY
-) {
+const web3formsKey =
+  process.env.VITE_WEB3FORMS_ACCESS_KEY || env.VITE_WEB3FORMS_ACCESS_KEY || ""
+if (!web3formsKey) {
   console.error(
-    "[verify-env] VITE_WEB3FORMS_ACCESS_KEY no debe vivir en el bundle del cliente. Quítala de .env y de las variables del proyecto; se configura como secreto del Worker (wrangler pages secret put WEB3FORMS_ACCESS_KEY).",
+    "[verify-env] Falta VITE_WEB3FORMS_ACCESS_KEY. En local declárala en .env; en Cloudflare Pages declárala en Settings -> Environment variables (Production). Sin ella el formulario no puede enviar correo.",
   )
   process.exit(1)
 }
 
-console.log("[verify-env] OK: sin claves sensibles en el bundle.")
+if (env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY) {
+  console.error(
+    "[verify-env] TURNSTILE_SECRET_KEY no debe vivir en el bundle del cliente ni en VITE_*. Se configura como secreto del Worker (wrangler secret put TURNSTILE_SECRET_KEY --name qbits-global).",
+  )
+  process.exit(1)
+}
+
+console.log("[verify-env] OK: access key presente y sin secretos en el bundle.")

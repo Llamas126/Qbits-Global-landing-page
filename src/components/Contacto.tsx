@@ -4,11 +4,7 @@ import { toast } from "sonner"
 import { Turnstile } from "@marsidev/react-turnstile"
 import type { TurnstileInstance } from "@marsidev/react-turnstile"
 import SectionHeading from "./Section"
-import { TURNSTILE_SITE_KEY } from "@/config"
-
-const WEB3FORMS_ACCESS_KEY = String(
-  import.meta.env.VITE_WEB3FORMS_ACCESS_KEY ?? "",
-)
+import { TURNSTILE_SITE_KEY, WEB3FORMS_ACCESS_KEY } from "@/config"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"

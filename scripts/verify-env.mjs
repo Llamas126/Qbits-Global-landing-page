@@ -14,15 +14,6 @@ try {
   env = {}
 }
 
-const web3formsKey =
-  process.env.VITE_WEB3FORMS_ACCESS_KEY || env.VITE_WEB3FORMS_ACCESS_KEY || ""
-if (!web3formsKey) {
-  console.error(
-    "[verify-env] Falta VITE_WEB3FORMS_ACCESS_KEY. En local declárala en .env; en Cloudflare Pages declárala en Settings -> Environment variables (Production). Sin ella el formulario no puede enviar correo.",
-  )
-  process.exit(1)
-}
-
 if (env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY) {
   console.error(
     "[verify-env] TURNSTILE_SECRET_KEY no debe vivir en el bundle del cliente ni en VITE_*. Se configura como secreto del Worker (wrangler secret put TURNSTILE_SECRET_KEY --name qbits-global).",
@@ -30,4 +21,4 @@ if (env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY) {
   process.exit(1)
 }
 
-console.log("[verify-env] OK: access key presente y sin secretos en el bundle.")
+console.log("[verify-env] OK: sin secretos en el bundle.")

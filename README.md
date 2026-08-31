@@ -53,28 +53,45 @@ npm run dev
 ## Configuración
 
 El formulario de contacto usa [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile)
-y [Web3Forms](https://web3forms.com). La site key de Turnstile está en `src/config.ts`
-(es pública por diseño; el navegador la necesita para renderizar el widget).
+y [Web3Forms](https://web3forms.com).
 
-El script `verify-env` integrado en `npm run build` detecta si hay una
-`VITE_WEB3FORMS_ACCESS_KEY` en el entorno y aborta si la encuentra (esa clave
-nunca debe ir en el bundle del cliente).
+### Variables públicas (cliente)
 
-### Secretos (Worker de Cloudflare)
+Crea un archivo `.env` en la raíz (no se versiona) con la access key de Web3Forms. Es
+**pública por diseño** y se usa para el envío client-side:
 
-La Web3Forms access key y la Turnstile secret key **nunca** viajan en el bundle del
-cliente. Se guardan como secretos del Worker de Cloudflare (proyecto `qbits-global`):
+```
+VITE_WEB3FORMS_ACCESS_KEY=tu_access_key_de_web3forms
+```
+
+El script `verify-env` integrado en `npm run build` aborta si esta variable falta
+(necesaria para el envío) y también si detecta una secret key de Turnstile en el entorno.
+
+> El build de **Cloudflare Pages clona el repo, así que `.env` no viaja a CI**. Declara la
+> variable en el dashboard: **Settings → Environment variables (Production)** →
+> `VITE_WEB3FORMS_ACCESS_KEY`.
+
+### Secreto del Worker de Cloudflare
+
+La Turnstile secret key **nunca** viaja en el bundle del cliente. Se guarda como secreto
+del Worker de Cloudflare (proyecto `qbits-global`):
 
 ```bash
-npx wrangler secret put WEB3FORMS_ACCESS_KEY --name qbits-global
 npx wrangler secret put TURNSTILE_SECRET_KEY --name qbits-global
 ```
 
+### Arquitectura de envío
+
+1. El navegador envía el token de Turnstile a `POST /api/contact`; el Worker lo valida
+   contra Turnstile con la *secret key* (server-side), nunca expuesta.
+2. Si es válido, el navegador envía el formulario **directamente** a
+   `https://api.web3forms.com/submit` (client-side, como exige Web3Forms) con el antispam
+   `botcheck` oculto.
+
 ### Worker + Workers Assets
 
-`src/worker.ts` implementa el [Cloudflare Worker](https://developers.cloudflare.com/workers/)
-que maneja `POST /api/contact` (verificación server-side de Turnstile con la *secret key* y
-reenvío a Web3Forms). Los archivos estáticos de `dist/` se sirven directamente vía
+`src/worker.ts` es el [Cloudflare Worker](https://developers.cloudflare.com/workers/)
+que valida Turnstile en `POST /api/contact` y sirve los estáticos de `dist/` vía
 [Workers Assets](https://developers.cloudflare.com/workers/static-assets/).
 
 En desarrollo, `npm run dev:worker` levanta el Worker + assets localmente.
@@ -92,7 +109,7 @@ Antes del primer despliegue, autentícate con `npx wrangler login`.
 
 - **Cloudflare Turnstile**: la site key (en `src/config.ts`) debe tener permitido el dominio
   `qbitsglobal.com`. La secret key se configura como secreto del Worker.
-- **Web3Forms**: la access key se configura como secreto del Worker.
+- **Web3Forms**: la access key se configura en `.env` / Environment variables del proyecto.
 
 Referencias: [Web3Forms](https://web3forms.com) · [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile)
 

@@ -65,6 +65,11 @@ VITE_TURNSTILE_SITE_KEY=tu_site_key_de_cloudflare_turnstile
 El script `verify-env` integrado en `npm run build` falla si esta variable falta o si
 detecta una `VITE_WEB3FORMS_ACCESS_KEY` (ya no se usa en el cliente).
 
+> El build de **Cloudflare Pages clona el repo, así que `.env` no viaja a CI**. Para que el
+> despliegue compile, declara la variable en el dashboard:
+> **Settings → Environment variables (Production)** →
+> `VITE_TURNSTILE_SITE_KEY` con el valor de tu site key.
+
 ### Secretos (Worker de Cloudflare)
 
 Web3Forms elimina el `VITE_WEB3FORMS_ACCESS_KEY`, la Web3Forms access key y la Turnstile

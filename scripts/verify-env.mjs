@@ -14,17 +14,21 @@ try {
   env = {}
 }
 
-const siteKey = env.VITE_TURNSTILE_SITE_KEY
+const siteKey =
+  process.env.VITE_TURNSTILE_SITE_KEY || env.VITE_TURNSTILE_SITE_KEY || ""
 if (!siteKey) {
   console.error(
-    "[verify-env] Falta VITE_TURNSTILE_SITE_KEY en .env. Sin ella el antispam (Cloudflare Turnstile) no se renderiza en producción.",
+    "[verify-env] Falta VITE_TURNSTILE_SITE_KEY. En local declárala en .env; en Cloudflare Pages declárala en Settings -> Environment variables (Production). Sin ella el antispam (Cloudflare Turnstile) no se renderiza.",
   )
   process.exit(1)
 }
 
-if (env.VITE_WEB3FORMS_ACCESS_KEY) {
+if (
+  env.VITE_WEB3FORMS_ACCESS_KEY ||
+  process.env.VITE_WEB3FORMS_ACCESS_KEY
+) {
   console.error(
-    "[verify-env] VITE_WEB3FORMS_ACCESS_KEY no debe vivir en el bundle del cliente. Quítala de .env; se configura como secreto del Worker (wrangler pages secret put WEB3FORMS_ACCESS_KEY).",
+    "[verify-env] VITE_WEB3FORMS_ACCESS_KEY no debe vivir en el bundle del cliente. Quítala de .env y de las variables del proyecto; se configura como secreto del Worker (wrangler pages secret put WEB3FORMS_ACCESS_KEY).",
   )
   process.exit(1)
 }

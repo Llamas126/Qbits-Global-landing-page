@@ -1,5 +1,9 @@
 {
-  "name": "qbits-global-landing-page",
+  "name": "qbits-global",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-08-31",
-  "pages_build_output_dir": "dist"
+  "assets": {
+    "directory": "dist",
+    "binding": "ASSETS"
+  }
 }
